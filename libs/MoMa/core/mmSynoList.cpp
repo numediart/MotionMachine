@@ -11,12 +11,6 @@
 using namespace std;
 using namespace MoMa;
 
-#ifdef _WIN32
-const std::string SynoList::DefaultPath = "../../../../libs/MoMa/resources/SynoList.txt";
-#else
-const std::string SynoList::DefaultPath = "../../../../../../../libs/MoMa/resources/SynoList.txt";
-#endif
-
 SynoList::SynoList( string fileName ) {
     
     load( fileName );
@@ -31,8 +25,6 @@ void SynoList::load( string fileName ) {
         cout << "SynoList: File could not be opened!" << endl;
         return; // We alert in stdout and quit if no/wrong file!
     }
-
-    syno.clear();
     
     for( string synLine; getline(synFile, synLine); ) {
         

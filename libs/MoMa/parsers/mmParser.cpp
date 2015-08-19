@@ -91,39 +91,21 @@ Parser::Parser( string const &fName, Track *tr ) {
                 delete track->boneList;
         }
     }
-    
+
     else if( extension == "bvh" ) {
-        
+
         track->setFileName( fileName.substr( sep + 1, dot-sep-1 ) );
-        
+
         BvhParser::load( fileName, track );
-        
+
         // Check validity of list of bones
         if( track->nOfNodes() != previousSize &&
-           previousSize !=0 && track->hasBoneList == true ) {
-            
-            // different number of
-            // markers => different skeleton
-            track->hasBoneList = false;
-            delete track->boneList;
-        }
-        this->setJointOffsetRotation(tr);
-    }
-    else if( extension == "cmp" ) {
-        
-        track->setFileName( fileName.substr( sep + 1, dot-sep-1 ) );
-        
-        CmpParser Parser;
-        Parser.load( fileName, track );
-        
-        // Check validity of list of bones
-        if( track->nOfNodes() != previousSize &&
-           previousSize !=0 && track->hasBoneList == true ) {
-            
-            // different number of
-            // markers => different skeleton
-            track->hasBoneList = false;
-            delete track->boneList;
+            previousSize !=0 && track->hasBoneList == true ) {
+
+                // different number of
+                // markers => different skeleton
+                track->hasBoneList = false;
+                delete track->boneList;
         }
         this->setJointOffsetRotation(tr);
     }
@@ -169,13 +151,13 @@ string Parser::checkFileName( string const &fName ) {
 
 bool Parser::setJointOffsetRotation(Track *tr) {
     
-    tr->rotationOffset.resize(4,tr->rotation.nOfCols());
+    tr->rotationOffset.resize(4,tr->rotation.nOfNodes());
     bool debug = false;
     if (!tr->boneList || !tr->hasNodeList || !tr->hasRotation || !tr->hasSynoList)
         return false;
 
     tr->rotationOffset.resize(4,tr->nOfNodes());
-    Frame frame0 = tr->frame((unsigned int)0);
+    Frame frame0 = tr->frame(0);
     arma::colvec frontalAxis;
     arma::colvec tempVec;
 

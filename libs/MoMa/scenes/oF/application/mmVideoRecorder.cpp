@@ -1,7 +1,5 @@
 #include "mmVideoRecorder.h"
 
-#ifndef TARGET_LINUX
-
 using namespace std;
 
 MoMa::VideoRecorder::VideoRecorder( void ) {
@@ -71,5 +69,3 @@ bool MoMa::VideoRecorder::isRecording( void ) {
     
     return( isVideoRecord );
 }
-
-#endif

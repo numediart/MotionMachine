@@ -14,11 +14,6 @@
 #include "mmCanvas.h"
 
 namespace MoMa {
-    
-    const int DefaultNodeSize = 40;
-    const int DefaultGridSize = 40;
-    const int DefaultViewDist = 1000;
-    const int DefaultPlotRes = 1000;
 
     class Canvas;
     
@@ -31,7 +26,7 @@ namespace MoMa {
         // - SCENE2D: clicks and keys affect the 2D figures
         // - ANNOTATE: clicks and keys affect the annotation
         // - CANVAS: clicks affect UI canvas (automatic)
-        
+    
         SCENE3D,
         SCENE2D,
         ANNOTATE,
@@ -44,22 +39,15 @@ namespace MoMa {
         // - PLAY: like a player, start and stop on space bar
         // - SCRUB: position of the mouse = position in the file
         // - STREAM: just displays latest frame (for ringbuffer)
-        
+    
         PLAY,
         SCRUB,
         STREAM
     };
     
-    struct AtPos {
-        
-        unsigned int index;
-        double time;
-    };
-    
     struct Plot { // Plot = one 2D curve in oF
         
-        // arma::vec data; // Raw data to synchronize with
-        MoMa::TimedVec data; // Raw timed data to synchronise
+        arma::vec data; // Raw data to synchronize with
         ofPolyline line; // Actual polyline to draw in oF
         std::string name; // Name of the curve ( if any )
         ofColor color; // Color of the curve in oF
@@ -108,7 +96,7 @@ namespace MoMa {
     static const ofColor Red = ofColor( 255, 0, 0 );
     
     // -- SceneApp --
-    
+
     class SceneApp : public ofBaseApp {
 
       public:
@@ -150,15 +138,11 @@ namespace MoMa {
         void draw( Node node ); // Draw a node
         void draw( Frame frame ); // Draw a frame
         
-        void draw( TimedVec tvec, int hue, std::string name="" ); // TimedVec
-        void draw( TimedVec tvec, std::string name="" ); // TimedVec (no hue)
-        void draw( TimedMat trace, std::string name="" ); // TimedMat
-        
-        void draw( Trace trace, std::string name="" ); // Trace
-        
         void draw( arma::vec data, int hue, std::string name="" );
         void draw( arma::vec data, std::string name="" ); // Vec
-        void draw( arma::mat data, string name="" ); // and Mat
+        
+        void draw( arma::mat data, string name="" ); // Mat and
+        void draw( Trace trace, std::string name="" ); // Trace
         
         void draw( LabelList labelList ); // Label list
         
@@ -196,10 +180,10 @@ namespace MoMa {
         void setPlaybackMode( int mode ); // Set playback mode
         void setFrameRate( float rate ); // Set playback rate
         
-        void setPlayerSize( unsigned int nOfFrames ); // Define size
-        void setPlayerSize( double time ); // Define size in sec
-        unsigned int getAppIndex( void ); // Query app index
-        double getAppTime( void ); // Query app time
+        // TODO replace setTrackSize() by setPlayerSize()
+        
+        void setPlayerSize( int size ); // Define track size
+        int getAppIndex( void ); // Query app index
         
         void zoom( int iMin, int iMax ); // Zoom
         void showAll( void ); // Back to fullsize
@@ -229,8 +213,6 @@ namespace MoMa {
         void setNodeSize( float size ); // Set node size
         void setGridSize( float size ); // Set grid size
         void setViewDistance( float dist ); // Set distance
-        
-        void setPlotResolution( int reso ); // Set resolution
         
         void setActiveMode( int mode ); // Set active mode
         
@@ -275,10 +257,8 @@ namespace MoMa {
         
         virtual void dragged( ofDragInfo &drag );
         
-        // - Protected methods -
+        // - 2D rendering method -
         
-        unsigned int getIndexFromTime( double time );
-        double getTimeFromIndex( unsigned int idx );
         void render2d( void );
         
         // - Visualisation types -
@@ -316,11 +296,10 @@ namespace MoMa {
         bool is2D; // Check drawing context
         vector<Figure> _figure; // List of figures
         int figureIdx; // Figure to be drawn in
-        int plotResolution; // Plot resolution
         
         // - X axis mapping -
         
-        AtPos lowBound, highBound, maxBound; // @
+        int idxMin, idxMax, playerSize; // x values
         int zoomLowBound, zoomHighBound; // Zoom
         
         // - Playback types -
@@ -328,9 +307,8 @@ namespace MoMa {
         int playbackMode; // Playback mode flag
         float frameRate; // Frame rate from playback
         bool isPlayback; // Do we keep play it back?
-        AtPos appAtPos; // App idnex/time @ position
-        // unsigned int appIndex; // App index
-        float fAppAtPosIndex; // Float index
+        float fAppIndex; // Float index
+        int appIndex; // App index
         bool isBegin; // Is begin?
         
         // - Video recorder -
@@ -350,6 +328,11 @@ namespace MoMa {
         LabelList *dragEventRegLabelList; // Registered label list
         bool hasMouseEventRegLabelList; // Has mouse-event registered?
         LabelList *mouseEventRegLabelList; // Registered label list
+        
+        //bool hasRegisteredAnnotationDragEvent; // Has registered?
+        //LabelList *registeredLabelList; // Registered label list
+        
+        //LabelList labelList; // TMP: current label list
         
         bool insertNewLabel; // Are we inserting a new label?
         bool isLabelSelected; // Is a label currently selected?

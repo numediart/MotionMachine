@@ -22,11 +22,11 @@ Trace::Trace( void ) {
 Node Trace::nodeFrame( double time ) {
 
     Node oneNode;
-    oneNode.setPosition(position.at(time));
+    oneNode.setPosition(position.getTimedFrame(time));
     oneNode.setName(this->name());
     oneNode.setRotationFlag( hasRotation() );
     if (hasRotation()){
-        oneNode.setRotation(rotation.at(time));
+        oneNode.setRotation(rotation.getTimedFrame(time));
         oneNode.setOffsetRotation(rotationOffset);
     }
     if (hasTime())
@@ -41,7 +41,7 @@ mat Trace::matrix( void ) {
 
     trace=position.getData();
     if( hasRotation() ) trace=arma::join_cols(trace, rotation.getData());
-    if( position.isTimed()&&hasTime() ) trace=arma::join_cols(trace,position.getTimeVec())  ;
+    if( position.isTimestamped()&&hasTime() ) trace=arma::join_cols(trace,position.getTimeStamps())  ;
     
     
     return( trace );
@@ -59,8 +59,8 @@ void Trace::print( void ) {
         if( hasRotation()  ) {
             cout << rotation.getData()<< "\n";
         }
-        if( hasTime() || position.isTimed() ) {
-            cout<<position.getTimeVec();
+        if( hasTime() || position.isTimestamped() ) {
+            cout<<position.getTimeStamps();
         }
         
         cout << endl;

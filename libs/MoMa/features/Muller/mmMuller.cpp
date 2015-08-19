@@ -130,10 +130,10 @@ mat Muller::continuous( Track &track ) {
                 const mat sliceT = track.position.getData().slice( t );
                 
                 // WristRight speed related to Neck in the perpendicular direction to plane ( Neck, HipRight, HipLeft )
-                cont( t, 0 ) = Geometry::velocityToNPlane( sliceT_1.unsafe_col( Neck ), sliceT.unsafe_col( Neck ), sliceT.unsafe_col( RHip ), sliceT.unsafe_col( LHip ), sliceT_1.unsafe_col( RWrist ), sliceT.unsafe_col( RWrist ) ) * track.frameRate();
+                cont( t, 0 ) = Geometry::velocityToNPlane( sliceT_1.unsafe_col( Neck ), sliceT.unsafe_col( Neck ), sliceT.unsafe_col( RHip ), sliceT.unsafe_col( LHip ), sliceT_1.unsafe_col( RWrist ), sliceT.unsafe_col( RWrist ) ) * track.frameRate;
                 
                 // WristLeft speed related to Neck in the perpendicular direction to plane ( Neck, HipRight, HipLeft )
-                cont( t, 1 ) =  Geometry::velocityToNPlane( sliceT_1.unsafe_col( Neck ), sliceT.unsafe_col( Neck ), sliceT.unsafe_col( RHip ), sliceT.unsafe_col( LHip ), sliceT_1.unsafe_col( LWrist ), sliceT.unsafe_col( LWrist ) ) * track.frameRate();
+                cont( t, 1 ) =  Geometry::velocityToNPlane( sliceT_1.unsafe_col( Neck ), sliceT.unsafe_col( Neck ), sliceT.unsafe_col( RHip ), sliceT.unsafe_col( LHip ), sliceT_1.unsafe_col( LWrist ), sliceT.unsafe_col( LWrist ) ) * track.frameRate;
                 
                 // Distance between WristRight and plane fixed in Neck and normal to vector Thorax-> Neck
                 cont( t, 2 ) = Geometry::distanceToNPlane( sliceT.unsafe_col( Thorax ), sliceT.unsafe_col( Neck ), sliceT.unsafe_col( Neck ), sliceT.unsafe_col( RWrist ) );
@@ -142,10 +142,10 @@ mat Muller::continuous( Track &track ) {
                 cont( t, 3 ) = Geometry::distanceToNPlane( sliceT.unsafe_col( Thorax ), sliceT.unsafe_col( Neck ), sliceT.unsafe_col( Neck ), sliceT.unsafe_col( LWrist ) );
                 
                 // WristRight speed related to SpineMiddle in the direction SpineBase->SpineMiddle : TODO change back neck to thorax with updated thorax
-                cont( t, 4 ) = Geometry::velocityToVect( sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( Neck ), sliceT_1.unsafe_col( Neck ), sliceT.unsafe_col( Neck ), sliceT_1.unsafe_col( RWrist ), sliceT.unsafe_col( RWrist ) ) * track.frameRate();
+                cont( t, 4 ) = Geometry::velocityToVect( sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( Neck ), sliceT_1.unsafe_col( Neck ), sliceT.unsafe_col( Neck ), sliceT_1.unsafe_col( RWrist ), sliceT.unsafe_col( RWrist ) ) * track.frameRate;
                 
                 // WristLeft speed related to SpineMiddle in the direction SpineBase->SpineMiddle
-                cont( t, 5 ) = Geometry::velocityToVect( sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( Neck ), sliceT_1.unsafe_col( Neck ), sliceT.unsafe_col( Neck ), sliceT_1.unsafe_col( LWrist ), sliceT.unsafe_col( LWrist ) ) * track.frameRate();
+                cont( t, 5 ) = Geometry::velocityToVect( sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( Neck ), sliceT_1.unsafe_col( Neck ), sliceT.unsafe_col( Neck ), sliceT_1.unsafe_col( LWrist ), sliceT.unsafe_col( LWrist ) ) * track.frameRate;
                 
                 // Angle between ElbowRight->ShoulderRight and ElbowRight->WristRight vectors
                 cont( t, 6 ) = Geometry::radToDeg( Geometry::angleBtwVectors( sliceT.unsafe_col( RElbow ), sliceT.unsafe_col( RShoulder ), sliceT.unsafe_col( RElbow ), sliceT.unsafe_col( RWrist ) ) );
@@ -157,25 +157,25 @@ mat Muller::continuous( Track &track ) {
                 cont( t, 8 ) = Geometry::distanceToNPlane( sliceT.unsafe_col( LShoulder ), sliceT.unsafe_col( RShoulder ), sliceT.unsafe_col( LWrist ), sliceT.unsafe_col( RWrist ) );
                 
                 // WristLeft speed related to WristRight in the direction WristLeft->WristRight
-                cont( t, 9 ) = Geometry::velocityToVect( sliceT.unsafe_col( LWrist ), sliceT.unsafe_col( RWrist ), sliceT_1.unsafe_col( RWrist ), sliceT.unsafe_col( RWrist ), sliceT_1.unsafe_col( LWrist ), sliceT.unsafe_col( LWrist ) ) * track.frameRate();
+                cont( t, 9 ) = Geometry::velocityToVect( sliceT.unsafe_col( LWrist ), sliceT.unsafe_col( RWrist ), sliceT_1.unsafe_col( RWrist ), sliceT.unsafe_col( RWrist ), sliceT_1.unsafe_col( LWrist ), sliceT.unsafe_col( LWrist ) ) * track.frameRate;
                 
                 // WristRight speed related to SpineBase in the direction of WristRight->SpineBase
-                cont( t, 10 ) = Geometry::velocityToVect( sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( RWrist ), sliceT_1.unsafe_col( Pelvis ), sliceT.unsafe_col( Pelvis ), sliceT_1.unsafe_col( RWrist ), sliceT.unsafe_col( RWrist ) ) * track.frameRate();
+                cont( t, 10 ) = Geometry::velocityToVect( sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( RWrist ), sliceT_1.unsafe_col( Pelvis ), sliceT.unsafe_col( Pelvis ), sliceT_1.unsafe_col( RWrist ), sliceT.unsafe_col( RWrist ) ) * track.frameRate;
                 
                 // WristLeft speed related to SpineBase in the direction of WristLeft->SpineBase
-                cont( t, 11 ) = Geometry::velocityToVect( sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( LWrist ), sliceT_1.unsafe_col( Pelvis ), sliceT.unsafe_col( Pelvis ), sliceT_1.unsafe_col( LWrist ), sliceT.unsafe_col( LWrist ) ) * track.frameRate();
+                cont( t, 11 ) = Geometry::velocityToVect( sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( LWrist ), sliceT_1.unsafe_col( Pelvis ), sliceT.unsafe_col( Pelvis ), sliceT_1.unsafe_col( LWrist ), sliceT.unsafe_col( LWrist ) ) * track.frameRate;
                 
                 // WristRight speed
-                cont( t, 12 ) = norm( sliceT_1.unsafe_col( RWrist ) - sliceT.unsafe_col( RWrist ) ) * track.frameRate();
+                cont( t, 12 ) = norm( sliceT_1.unsafe_col( RWrist ) - sliceT.unsafe_col( RWrist ) ) * track.frameRate;
                 
                 // WristLeft speed
-                cont( t, 13 ) = norm( sliceT_1.unsafe_col( LWrist ) - sliceT.unsafe_col( LWrist ) ) * track.frameRate();
-                
-                // Distance between AnkleRight and plane defined by ( SpineBase, HipLeft, FootLeft )
-                cont( t, 14 ) = - Geometry::distanceToPlane( sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( LHip ), sliceT.unsafe_col( LFoot ), sliceT.unsafe_col( RAnkle ) );
+                cont( t, 13 ) = norm( sliceT_1.unsafe_col( LWrist ) - sliceT.unsafe_col( LWrist ) ) * track.frameRate;
                 
                 // Distance between AnkleLeft and plane defined by ( SpineBase, HipRight, FootRight )
-                cont( t, 15 ) = - Geometry::distanceToPlane( sliceT.unsafe_col( RFoot ), sliceT.unsafe_col( RHip ), sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( LAnkle ) );
+                cont( t, 14 ) = - Geometry::distanceToPlane( sliceT.unsafe_col( RFoot ), sliceT.unsafe_col( RHip ), sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( LAnkle ) );
+
+                // Distance between AnkleRight and plane defined by ( SpineBase, HipLeft, FootLeft )
+                cont( t, 15 ) = - Geometry::distanceToPlane( sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( LHip ), sliceT.unsafe_col( LFoot ), sliceT.unsafe_col( RAnkle ) );
                 
                 // Distance between AnkleRight and plane parallel to ground and fixed at the minimum height of all body points - AnkleRight
                 cont( t, 16 ) = Geometry::distanceToNPlane( nullVec, zVec, zVec*BoundingBox::lowest( sliceT,  RAnkle  )( Z ), sliceT.unsafe_col( RAnkle ) );
@@ -196,16 +196,16 @@ mat Muller::continuous( Track &track ) {
                 cont( t, 21 ) = - Geometry::distanceToNPlane( sliceT.unsafe_col( LHip ), sliceT.unsafe_col( RHip ), sliceT.unsafe_col( LHip ), sliceT.unsafe_col( RAnkle ) ) + Geometry::distanceToNPlane( sliceT.unsafe_col( LHip ), sliceT.unsafe_col( RHip ), sliceT.unsafe_col( LHip ), sliceT.unsafe_col( LAnkle ) ); // threshold=0
                 
                 // AnkleRight speed related to AnkleLeft in the direction AnkleRight->AnkleLeft projected on direction HipRight->HipLeft (lateral cross-feet speed)
-                cont( t, 22 ) = f22( sliceT_1.unsafe_col(RAnkle ), sliceT.unsafe_col( RAnkle ), sliceT_1.unsafe_col( LAnkle ), sliceT.unsafe_col( LAnkle ), sliceT.unsafe_col( LHip ), sliceT.unsafe_col( RHip ) )* track.frameRate();
+                cont( t, 22 ) = f22( sliceT_1.unsafe_col(RAnkle ), sliceT.unsafe_col( RAnkle ), sliceT_1.unsafe_col( LAnkle ), sliceT.unsafe_col( LAnkle ), sliceT.unsafe_col( LHip ), sliceT.unsafe_col( RHip ) )* track.frameRate;
                 
                 // Inverse of muller (t, 22)
                 cont( t, 23 ) = -cont( t, 22 );
                 
                 // AnkleRight speed
-                cont( t, 24 ) = norm( sliceT_1.unsafe_col( RAnkle ) - sliceT.unsafe_col( RAnkle ) )* track.frameRate();
+                cont( t, 24 ) = norm( sliceT_1.unsafe_col( RAnkle ) - sliceT.unsafe_col( RAnkle ) )* track.frameRate;
                 
                 // AnkleLeft speed
-                cont( t, 25 ) = norm( sliceT_1.unsafe_col( LAnkle ) - sliceT.unsafe_col( LAnkle ) )* track.frameRate();
+                cont( t, 25 ) = norm( sliceT_1.unsafe_col( LAnkle ) - sliceT.unsafe_col( LAnkle ) )* track.frameRate;
                 
                 // Angle between Neck->SpineBase and ShoulderRight->ElbowRight vectors (angle between right arm and body spine)
                 cont( t, 26 ) = Geometry::radToDeg( Geometry::angleBtwVectors( sliceT.unsafe_col( Neck ), sliceT.unsafe_col( Pelvis ), sliceT.unsafe_col( RShoulder ), sliceT.unsafe_col( RElbow ) ) );
@@ -244,7 +244,16 @@ mat Muller::continuous( Track &track ) {
                 cont( t, 37 ) = BoundingBox::width( sliceT );
                 
                 // SpineBase speed
-                cont( t, 38 ) = norm( sliceT_1.unsafe_col(Pelvis ) - sliceT.unsafe_col( Pelvis ) )* track.frameRate();
+                cont( t, 38 ) = norm( sliceT_1.unsafe_col(Pelvis ) - sliceT.unsafe_col( Pelvis ) )* track.frameRate;
+
+				// Angle between an immobile vector (reference) and the pelvis-left hip vector (this will be approximatively derivated to give a rotation)
+				vec tmp = zeros(2);
+				vec tmp2 = tmp;
+				tmp2(1) = 1;
+                cont( t, 39 ) = Geometry::radToDeg( Geometry::angleBtwVectors2D(tmp, tmp2, sliceT.unsafe_col( Pelvis ).rows(0,1), sliceT.unsafe_col( LHip ).rows(0,1)) );
+                
+				//([0 0],[0 1],PELVIS(t,1:2),HIP_LEFT(t,1:2)))
+				//(join_vert(0,0), join_vert(0,1), sliceT.unsafe_col( Pelvis ).rows(1,2), sliceT.unsafe_col( LHip ).rows(1,2))
             }
         }
     }
@@ -293,7 +302,7 @@ mat Muller::binary( mat &cont, float meanHl, float meanSw, float meanHw ) {
         bina.col( 28 ) = Signal::thresh( cont.col( 28 ), 50, 40, 0, 1 );
         bina.col( 29 ) = Signal::thresh( cont.col( 29 ), 50, 40, 0, 1 );
         bina.col( 30 ) = Signal::thresh( cont.col( 30 ), 0.5 * meanHl, 0.35 * meanHl, 0, 1 );
-        bina.col( 31 ) = Signal::thresh( cont.col( 31 ), 70, 60, 0, 1 );
+        bina.col( 31 ) = Signal::thresh( -cont.col( 31 ), -120, -125, 0, 1 );
         bina.col( 32 ) = Signal::thresh( cont.col( 32 ), -1.1 * meanHl, -1.3 * meanHl, 0, 1 );
         bina.col( 33 ) = Signal::thresh( cont.col( 33 ), -1.1 * meanHl, -1.3 * meanHl, 0, 1 );
         bina.col( 34 ) = Signal::thresh( cont.col( 34 ), 100, 90, 0, 1 );
@@ -301,6 +310,15 @@ mat Muller::binary( mat &cont, float meanHl, float meanSw, float meanHw ) {
         bina.col( 36 ) = Signal::thresh( -cont.col( 36 ), -4 * meanHl, -4.3 * meanHl, 0, 1 );
         bina.col( 37 ) = Signal::thresh( cont.col( 37 ), 4 * meanHl, 3.8 * meanHl, 0, 1 );
         bina.col( 38 ) = Signal::thresh( cont.col( 38 ), 2.3 * meanHl, 1.9 * meanHl, 0, 1 );
+
+		//Approximate derivative of cont.col(39) to have the rotation around the body spine
+		vec diffCol39;
+		diffCol39.set_size(cont.n_rows);
+		diffCol39.row(0)=0;
+		for(int i=1; i<cont.n_rows; i++){
+			diffCol39.row(i)=abs(cont.col( 39 ).row(i)-cont.col( 39 ).row(i-1));
+		}
+		bina.col( 39 ) = Signal::thresh( diffCol39, 2.2, 2, 0, 1 );
     }
     
     return( bina );
@@ -391,4 +409,5 @@ MoMa::Muller::ThresholdNames::ThresholdNames( void ) {
     this->at( 36 ) = "Y-extents of body is small";
     this->at( 37 ) = "XZ-extents of body is large";
     this->at( 38 ) = "Root is fast";
+	this->at( 39 ) = "Actor is rotating around his body spine";
 }

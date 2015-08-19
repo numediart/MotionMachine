@@ -4,8 +4,6 @@
 #include <armadillo>
 #include "ofMain.h"
 
-#ifndef TARGET_LINUX
-
 #ifdef _WIN32
 #include "ofxQtVideoSaver.h"
 #else
@@ -40,7 +38,5 @@ namespace MoMa {
 #endif
     };
 }
-
-#endif
 
 #endif

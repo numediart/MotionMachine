@@ -21,7 +21,7 @@ Track::Track( void ) {
     synoList = NULL; // Not allocated
     hasSynoList = false; // No synonym list
 
-    setFrameRate( 177.0f ); // Qualisys
+    frameRate = 177.0f; // Qualisys
     hasRotation = false; // No rotation
 
     nodeList = NULL; // Not allocated
@@ -30,10 +30,14 @@ Track::Track( void ) {
     boneList = NULL; // Not allocated
     hasBoneList = false; // No node name list
 
-    //FIXME this should not be in constructor, among other things, it causes unnecessary
-    //      load of the SynoList when creating a subtrack.
-    this->synolist(SynoList::DefaultPath);
-    
+#ifdef _WIN32
+    synoList = new SynoList( "../../../../libs/MoMa/resources/SynoList.txt" );
+#else
+    synoList = new SynoList( "../../../../../../../libs/MoMa/resources/SynoList.txt" );
+#endif
+
+    if( synoList != NULL ) hasSynoList = true;
+
     ringSize = 0; // Init ring buffer size
     isRing = false; // Not ring buffer
 }
@@ -43,18 +47,6 @@ Track::~Track( void ) {
     if( hasNodeList ) delete nodeList; // Deallocation
     if( hasBoneList ) delete boneList; // Deallocation
     if( hasSynoList ) delete synoList; // Deallocation
-}
-
-void Track::synolist( string fileName ) {
-
-    if( hasSynoList == true ) {
-
-        delete synoList;
-        hasSynoList = false;
-    }
-
-    synoList = new SynoList( fileName );
-    hasSynoList = true;
 }
 
 void Track::nodes( string fileName ) {
@@ -101,13 +93,13 @@ void Track::push( Frame _frame ) {
         
         hasRotation = true;
         
-        if( rotation.isTimed() && _frame.hasTime() ) {
+        if( rotation.isTimestamped() && _frame.hasTime() ) {
             
-            rotation.push( _frame.getRotation(), _frame.time() );
+            rotation.pushTimedFrame( _frame.getRotation(), _frame.time() );
             
         } else {
             
-            rotation.push( _frame.getRotation() );
+            rotation.pushFrame( _frame.getRotation() );
         }
         
         if( rotationOffset.n_elem == 0 ) {
@@ -116,15 +108,114 @@ void Track::push( Frame _frame ) {
         }
     }
     
-    if( position.isTimed() && _frame.hasTime() ) {
+    if( position.isTimestamped() && _frame.hasTime() ) {
         
-        position.push( _frame.getPosition(), _frame.time() );
+        position.pushTimedFrame( _frame.getPosition(), _frame.time() );
         
     } else {
         
         arma::mat temp = _frame.getPosition();
-        position.push( temp );
+        position.pushFrame( temp );
     }
+}
+
+Trace Track::trace( string name ) {
+    
+    // TODO Is that guy still compatible with containers?
+
+    Trace oneTrace;
+    int nIdx = -1; // Initialise
+    bool isFound = false; // Flag
+    
+    if( hasNodeList ) {
+        
+        for( int n=0; n<nodeList->size(); n++ ) {
+            
+            // If we find a matching name, we save index
+            if( nodeList->at(n).compare( name ) == 0 ) {
+                
+                isFound = true;
+                nIdx = n;
+            }
+        }
+        
+        if( hasSynoList && !isFound ) {
+            
+            for( int n=0; n<nodeList->size(); n++ ) {
+                
+                std::string nNameQuery = "nq"; // Synonym of name query
+                std::string nFromList = "fl"; // Synonym of nth in list
+                
+                synoList->search( name, nNameQuery ); // Search name
+                synoList->search( nodeList->at(n), nFromList ); // & list
+                
+                if( nFromList.compare( nNameQuery ) == 0 ) {
+                    
+                    nIdx = n;
+                    isFound = true;
+                }
+            }
+        }
+        
+        if( isFound ) {
+            
+            
+            return this->trace(nIdx);
+            //oneTrace.setName( name );
+            //oneTrace.setTimeFlag( true );
+            //oneTrace.setRotationFlag( hasRotation );
+            
+            //for( int f=0; f<nOfFrames(); f++ ) {
+                
+            //    oneTrace.push( frame( f ).node( name ) );
+            //}
+            
+        } else {
+            
+            std::cout << "Frame::node: Node not found" << std::endl;
+        }
+        
+    } else {
+        
+        std::cout << "Frame::node: No node name list" << std::endl;
+    }
+
+
+    return( oneTrace );
+}
+
+Trace Track::trace( int index ) {
+
+    Trace oneTrace;
+
+    oneTrace.setTimeFlag( true );
+    oneTrace.setRotationFlag( hasRotation );
+    oneTrace.setName( nodeList->at(index) );
+    
+    if( position.isTimestamped() ) {
+        
+        oneTrace.setPosition( position.getData().tube( 0,index, 2 , index ), position.getTimeStamps() );
+        
+    } else {
+        //arma::cube test=(position.getData().tube( 0,index, 2, index ));
+        //test=reshape(test,test.n_rows,test.n_slices,1);
+        //arma::mat test2=test.slice(0);
+        oneTrace.setPosition( position.getData().tube( 0,index, 2, index ), position.getFrameRate() );
+    }
+    if (hasRotation){
+        if( rotation.isTimestamped() ) {
+        
+            oneTrace.setRotation( rotation.getData().tube( 0,index, 2, index), position.getTimeStamps() );
+            oneTrace.setRotationOffset(rotationOffset.col(index));
+        
+        }
+        else {
+            oneTrace.setRotation( rotation.getData().tube(0, index, 2, index ), position.getFrameRate() );
+            oneTrace.setRotationOffset(rotationOffset.col(index));
+        }
+    }
+    
+    return( oneTrace );
 }
 
 void Track::setName( string name ) {
@@ -155,31 +246,17 @@ int Track::index( std::string name ) {
 
     if( nOfFrames() > 0 && hasNodeList ) {
 
-        Frame oneFrame = frame( (unsigned int)0 );
+        Frame oneFrame = frame( 0 );
         nIdx = oneFrame.index( name );
     }
 
     return( nIdx );
 }
 
-void Track::setFrameRate( float rate ) {
-    
-    _frameRate = rate;
-    
-    position.setFrameRate( rate );
-    
-    if( hasRotation ) {
-    
-        rotation.setFrameRate( rate );
-    }
-}
-
 void Track::clear( void ) {
     
-    rotationOffset.clear();
     rotation.clear();
     position.clear();
-    hasRotation = false;
 }
 
 void Track::subTrack( Track &subTr, int beg, int end) {
@@ -210,7 +287,7 @@ void Track::subTrack( Track &subTr, int beg, int end) {
     
     subTr.easyName = easyName;
     subTr.fileName = fileName;
-    subTr._frameRate = _frameRate;
+    subTr.frameRate = frameRate;
     subTr.ringSize = ringSize;
     subTr.isRing = isRing;
     
@@ -218,28 +295,28 @@ void Track::subTrack( Track &subTr, int beg, int end) {
     
     if( hasRotation ) {
         
-        if( rotation.isTimed() ) {
+        if( rotation.isTimestamped() ) {
             
             // TODO
             
-            subTr.rotation.setData( rotation.getTimeVec().subvec( beg, end ), rotation.getData().slices( beg, end ) );
+            subTr.rotation.setTimedData( rotation.getTimeStamps().subvec( beg, end ), rotation.getData().slices( beg, end ) );
             subTr.rotationOffset = rotationOffset;
             
         } else {
             
-            subTr.rotation.setData( rotation.frameRate(), rotation.getData().slices( beg, end ) );
+            subTr.rotation.setData( rotation.getFrameRate(), rotation.getData().slices( beg, end ) );
             subTr.rotationOffset = rotationOffset;
         }
     }
     
-    if( position.isTimed() ) {
+    if( position.isTimestamped() ) {
         
         // TODO
         
-        subTr.position.setData( position.getTimeVec().subvec( beg, end ),position.getData().slices( beg, end ) );
+        subTr.position.setTimedData( position.getTimeStamps().subvec( beg, end ),position.getData().slices( beg, end ) );
         
     } else {
         
-        subTr.position.setData( position.frameRate(), position.getData().slices( beg, end ) );
+        subTr.position.setData( position.getFrameRate(), position.getData().slices( beg, end ) );
     }
 }

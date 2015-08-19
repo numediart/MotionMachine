@@ -28,8 +28,6 @@ namespace MoMa {
         
         void print( void ); // Print the list of synonyms
 
-        static const std::string DefaultPath;
-
       private:
 
         std::map< std::string, std::string> syno;

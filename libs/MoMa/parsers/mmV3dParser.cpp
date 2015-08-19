@@ -221,8 +221,7 @@ void V3dParser::load( string const &fileName, Track *track ) {
                             thisStream >> value[11];
                         }
 
-                        if( value[0] == "NaN" ||  atof( value[0].c_str() ) > MOMAINF ) {
-
+                        if( value[0] == "NaN" ||  atof( value[0].c_str() ) > 100000000000 ) {
 
                             // Data are ignored and the
                             // tempNode keeps arma's nans for positions
@@ -308,7 +307,10 @@ void V3dParser::load( string const &fileName, Track *track ) {
                         track->rotation.getRefData().slice(frameCpt)=rotMat;
 
                     //track->push( tempFrame );
-                    track->setFrameRate( 177 ); // TODO to define to look for
+                    track->position.setFrameRate(177);
+                    if (track->hasRotation)
+                        track->rotation.setFrameRate(177);
+                    track->frameRate = 177; // TODO to define to look for
                     //std::cout<<frameCpt<<std::endl<<track->position.getRefData().slice(frameCpt)<<std::endl;
                     frameCpt++;
                 }
